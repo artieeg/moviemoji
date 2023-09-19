@@ -14,13 +14,12 @@ export function EmojiDisplay({
     <div
       key={emojis.join("")}
       className={twJoin(
-        "space-x-1 flex bg-overlay w-full sm:max-w-xs items-center justify-center select-none rounded-4xl ",
-        minimized ? "p-6" : "p-8",
+        "space-x-1 h-32 px-8 flex bg-overlay w-full sm:max-w-xs items-center  select-none rounded-4xl",
       )}
     >
       {emojis.map((e, idx) => (
         <motion.div
-          className="self-baseline"
+          className="flex-1"
           initial={{ scale: 0.5, opacity: 0 }}
           transition={{ delay: 0.1 + idx * 0.1, duration: 0.2 }}
           animate={{
