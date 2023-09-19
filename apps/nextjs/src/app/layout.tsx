@@ -6,16 +6,17 @@ import "~/styles/globals.css";
 import { headers } from "next/headers";
 
 import { TRPCReactProvider } from "./providers";
+import {twJoin} from "tailwind-merge";
 
 const montserrat = Montserrat({
   variable: "--font-primary",
-  subsets: ["latin-ext", "latin"],
+  subsets: ["latin"],
   weight: ["700"],
 });
 
 const poppins = Poppins({
   variable: "--font-secondary",
-  subsets: ["latin-ext", "latin"],
+  subsets: ["latin"],
   weight: ["500"],
 });
 
@@ -35,7 +36,7 @@ export default function Layout(props: { children: React.ReactNode }) {
     <html lang="en">
       <body
         className={
-          ([montserrat.variable, poppins.variable].join(" "),
+          twJoin([montserrat.variable, poppins.variable].join(" "),
           "bg-gradient-to-t from-purple-1 to-purple-2")
         }
       >

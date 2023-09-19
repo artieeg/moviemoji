@@ -23,12 +23,13 @@ export function UserGuessInput({
         ref={ref}
         type="text"
         placeholder="Your Guess"
+        value={value}
         style={{
           fontSize,
         }}
         className={twJoin(
           "space-x-1 transition-all duration-200 w-full placeholder:text-white placeholder:opacity-30 bg-transparent select-none appearance-none focus:outline-none",
-          "text-center text-6xl font-secondary",
+          "text-center text-6xl font-primary",
         )}
         {...rest}
       />

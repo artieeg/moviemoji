@@ -8,7 +8,7 @@ export function Button() {
       <motion.button
         whileTap={{ translateY: 0 }}
         initial={{ translateY: -3 }}
-        className="z-10 relative bg-white h-10 w-full text-neutral-1 font-bold px-4 rounded-full appearance-none"
+        className="z-10 relative bg-white h-10 w-full text-neutral-1 font-bold px-4 rounded-full appearance-none font-primary"
       >
         Play
       </motion.button>
