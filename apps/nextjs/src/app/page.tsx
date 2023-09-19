@@ -1,25 +1,22 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import React from "react";
 import { Button } from "~/components/Button";
-import {env} from "~/env.mjs";
 
 export const runtime = "edge";
 
 export default function HomePage() {
-  function onCaptchaComplete(c: any) {
-    console.log("Captcha complete!", c);
-  }
+  const router = useRouter();
 
+  function onStart() {
+    router.push("/user/new");
+  }
 
   return (
     <main className="flex h-screen flex-col text-white">
-      <div
-        className="cf-turnstile checkbox"
-        data-sitekey={env.NEXT_PUBLIC_CLOUDFLARE_SITE_KEY}
-        data-callback="onCaptchaComplete"
-      />
-      <div className="flex flex-col items-center justify-center flex-1 space-y-3">
-        <Button>Hello World</Button>
+      <div className="space-y-4 flex flex-col">
+        <Button onClick={onStart}>Play Now</Button>
       </div>
     </main>
   );
