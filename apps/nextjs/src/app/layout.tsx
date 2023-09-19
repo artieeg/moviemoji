@@ -8,6 +8,7 @@ import { headers } from "next/headers";
 import { TRPCReactProvider } from "./providers";
 import { twJoin } from "tailwind-merge";
 import { IconoirProvider } from "iconoir-react";
+import Script from "next/script";
 
 const montserrat = Montserrat({
   variable: "--font-primary",
@@ -35,6 +36,11 @@ export const metadata: Metadata = {
 export default function Layout(props: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <Script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+        async={true}
+        defer={true}
+      />
       <body
         className={twJoin(
           [montserrat.variable, poppins.variable].join(" "),
