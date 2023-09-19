@@ -82,6 +82,9 @@ importers:
       '@moviemoji/eslint-config':
         specifier: ^0.2.0
         version: link:../../tooling/eslint
+      '@moviemoji/tailwind-config':
+        specifier: ^0.1.0
+        version: link:../../tooling/tailwind
       '@moviemoji/tsconfig':
         specifier: ^0.1.0
         version: link:../../tooling/typescript
