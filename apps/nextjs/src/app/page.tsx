@@ -1,5 +1,9 @@
+"use client";
+
+import { Mic } from "iconoir-react";
 import { Button } from "~/components/Button";
 import { EmojiDisplay } from "~/components/EmojiDisplay";
+import { IconButton } from "~/components/IconButton";
 import { UserGuessInput } from "~/components/UserGuessInput";
 
 export const runtime = "edge";
@@ -11,6 +15,7 @@ export default function HomePage() {
         <EmojiDisplay minimized={false} emojis={["🕵️", "🏃‍♂️", "💰", "🛫"]} />
         <UserGuessInput value="hello" minimized={false} />
         <Button />
+        <IconButton icon={Mic} />
       </div>
     </main>
   );

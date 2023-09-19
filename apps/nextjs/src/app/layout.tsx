@@ -6,7 +6,8 @@ import "~/styles/globals.css";
 import { headers } from "next/headers";
 
 import { TRPCReactProvider } from "./providers";
-import {twJoin} from "tailwind-merge";
+import { twJoin } from "tailwind-merge";
+import { IconoirProvider } from "iconoir-react";
 
 const montserrat = Montserrat({
   variable: "--font-primary",
@@ -35,14 +36,23 @@ export default function Layout(props: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body
-        className={
-          twJoin([montserrat.variable, poppins.variable].join(" "),
-          "bg-gradient-to-t from-purple-1 to-purple-2")
-        }
+        className={twJoin(
+          [montserrat.variable, poppins.variable].join(" "),
+          "bg-gradient-to-t from-purple-1 to-purple-2",
+        )}
       >
-        <TRPCReactProvider headers={headers()}>
-          {props.children}
-        </TRPCReactProvider>
+        <IconoirProvider
+          iconProps={{
+            color: "#ffffff",
+            width: 32,
+            height: 32,
+            strokeWidth: 2,
+          }}
+        >
+          <TRPCReactProvider headers={headers()}>
+            {props.children}
+          </TRPCReactProvider>
+        </IconoirProvider>
       </body>
     </html>
   );

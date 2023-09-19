@@ -23,6 +23,7 @@
     "@trpc/react-query": "^10.38.3",
     "@trpc/server": "^10.38.3",
     "framer-motion": "^10.16.4",
+    "iconoir-react": "^6.11.0",
     "next": "^13.4.19",
     "react": "18.2.0",
     "react-dom": "18.2.0",
