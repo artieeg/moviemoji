@@ -32,7 +32,7 @@ export const userRouter = createTRPCRouter({
 
 async function verifyTurnstileToken(token: string) {
   let formData = new FormData();
-  formData.append("secret", process.env.CLOUDFLARE_TURNSTILE_SECRET as string);
+  formData.append("secret", process.env.CLOUDFLARE_SECRET_KEY as string);
   formData.append("response", token);
 
   const url = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
