@@ -11,10 +11,11 @@ export const runtime = "edge";
 export default function HomePage() {
   return (
     <main className="flex h-screen flex-col text-white">
-      <div className="flex flex-col items-center justify-center flex-1">
+      <div className="flex flex-col items-center justify-center flex-1 space-y-3">
         <EmojiDisplay minimized={false} emojis={["🕵️", "🏃‍♂️", "💰", "🛫"]} />
         <UserGuessInput value="hello" minimized={false} />
-        <Button />
+        <Button>Play</Button>
+        <Button variant="secondary">Play</Button>
         <IconButton icon={Mic} />
       </div>
     </main>
