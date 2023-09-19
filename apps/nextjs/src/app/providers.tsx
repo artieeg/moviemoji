@@ -9,6 +9,7 @@ import superjson from "superjson";
 
 import { env } from "~/env.mjs";
 import { api } from "~/utils/api";
+import React from "react";
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") return ""; // browser should use relative url
@@ -16,6 +17,8 @@ const getBaseUrl = () => {
 
   return `http://localhost:${env.PORT}`; // dev SSR should use localhost
 };
+
+export const token = { current: null } as { current: string | null };
 
 export function TRPCReactProvider(props: {
   children: React.ReactNode;
@@ -46,6 +49,11 @@ export function TRPCReactProvider(props: {
           headers() {
             const headers = new Map(props.headers);
             headers.set("x-trpc-source", "nextjs-react");
+
+            if (token.current) {
+              headers.set("authorization", `Bearer ${token.current}`);
+            }
+
             return Object.fromEntries(headers);
           },
         }),

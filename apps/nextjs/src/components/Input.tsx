@@ -1,13 +1,14 @@
 "use client";
 
-import { HTMLAttributes, useRef, useState } from "react";
+import { HTMLAttributes, useRef } from "react";
 import { twJoin } from "tailwind-merge";
 
-export function UserGuessInput({
+export function Input({
   minimized,
   value,
+  onChangeText,
   ...rest
-}: { value: string; minimized: boolean } & HTMLAttributes<HTMLInputElement>) {
+}: { value: string; onChangeText: (s: string) => void; minimized?: boolean } & HTMLAttributes<HTMLInputElement>) {
   const fontSize =
     value.length > 16
       ? 36 - 16 + 6
@@ -20,6 +21,9 @@ export function UserGuessInput({
   return (
     <div className="flex bg-overlay h-32 w-full sm:max-w-xs items-center justify-center rounded-4xl">
       <input
+        onChange={(e) => {
+          onChangeText(e.target.value);
+        }}
         ref={ref}
         type="text"
         placeholder="Your Guess"
