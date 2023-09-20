@@ -1,28 +1,30 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import * as jwt from "jsonwebtoken";
+import { SignJWT } from "jose";
+import { createId } from "@paralleldrive/cuid2";
 
 export const userRouter = createTRPCRouter({
   createUser: publicProcedure
     .input(
       z.object({
         turnstileToken: z.string(),
-        username: z.string(),
       }),
     )
-    .mutation(async ({ input: { username, turnstileToken }, ctx }) => {
+    .mutation(async ({ input: { turnstileToken }, ctx }) => {
       await verifyTurnstileToken(turnstileToken);
 
-      const token = jwt.sign(
-        {
-          username,
-        },
-        process.env.JWT_SECRET as string,
-        {
-          expiresIn: "1d",
-        },
-      );
+      const token = await new SignJWT({ id: createId() })
+        .setProtectedHeader({
+          alg: "HS256",
+        })
+        .setIssuedAt()
+        .setExpirationTime("1h")
+        .sign(
+          new TextEncoder().encode(
+            process.env.JWT_SECRET as string,
+          ),
+        );
 
       return {
         token,
