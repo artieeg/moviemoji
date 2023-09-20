@@ -33,7 +33,7 @@ export function Input({
     <div
       className={twJoin(
         "flex h-32 w-full sm:max-w-xs items-center justify-center rounded-4xl",
-        "transition-all duration-700",
+        "transition-all duration-300",
         mode === "correct"
           ? "bg-turquoise"
           : mode === "incorrect"
@@ -55,7 +55,7 @@ export function Input({
           fontSize,
         }}
         className={twJoin(
-          "space-x-1 transition-all transi h-full duration-700 w-full placeholder:text-white placeholder:opacity-30 bg-transparent select-none appearance-none focus:outline-none",
+          "space-x-1 transition-all h-full duration-700 w-full placeholder:text-white placeholder:opacity-30 bg-transparent select-none appearance-none focus:outline-none",
           "text-center text-6xl font-primary",
           mode === "input" ? "text-white" : "text-black",
         )}

@@ -11,7 +11,7 @@ export function Button({
   type,
 }: {
   onClick?: () => void;
-  variant?: "primary" | "secondary";
+  variant?: "primary" | "secondary" | "text";
   children: string;
   type?: "button" | "submit" | "reset";
 }) {
@@ -26,7 +26,9 @@ export function Button({
           "z-10 relative h-10 w-full font-bold px-4 rounded-full appearance-none font-primary",
           variant === "primary"
             ? "bg-white text-neutral-1"
-            : "bg-overlay text-white",
+            : variant === "secondary"
+            ? "bg-overlay text-white"
+            : "text-white",
         )}
       >
         {children}

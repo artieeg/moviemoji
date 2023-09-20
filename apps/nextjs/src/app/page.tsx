@@ -3,9 +3,9 @@
 import { Turnstile } from "@marsidev/react-turnstile";
 import { useRef, useState } from "react";
 import { Game } from "~/components/Game";
-import { env } from "~/env.mjs";
 import { api } from "~/utils/api";
 import { token } from "./providers";
+import { env } from "@moviemoji/env";
 
 export const runtime = "edge";
 

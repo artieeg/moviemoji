@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { SignJWT } from "jose";
 import { createId } from "@paralleldrive/cuid2";
+import { env } from "@moviemoji/env";
 
 export const userRouter = createTRPCRouter({
   createUser: publicProcedure
@@ -11,7 +12,7 @@ export const userRouter = createTRPCRouter({
         turnstileToken: z.string(),
       }),
     )
-    .mutation(async ({ input: { turnstileToken }, ctx }) => {
+    .mutation(async ({ input: { turnstileToken } }) => {
       await verifyTurnstileToken(turnstileToken);
 
       const token = await new SignJWT({ id: createId() })
@@ -20,11 +21,7 @@ export const userRouter = createTRPCRouter({
         })
         .setIssuedAt()
         .setExpirationTime("1h")
-        .sign(
-          new TextEncoder().encode(
-            process.env.JWT_SECRET as string,
-          ),
-        );
+        .sign(new TextEncoder().encode(process.env.JWT_SECRET as string));
 
       return {
         token,
@@ -34,7 +31,7 @@ export const userRouter = createTRPCRouter({
 
 async function verifyTurnstileToken(token: string) {
   let formData = new FormData();
-  formData.append("secret", process.env.CLOUDFLARE_SECRET_KEY as string);
+  formData.append("secret", env.CLOUDFLARE_SECRET_KEY as string);
   formData.append("response", token);
 
   const url = "https://challenges.cloudflare.com/turnstile/v0/siteverify";

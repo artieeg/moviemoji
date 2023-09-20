@@ -31,7 +31,7 @@ export function EmojiDisplay({
             key={e}
             className={twJoin(
               "transition-all duration-200",
-              minimized ? "text-5xl" : "text-6xl",
+              minimized ? "text-4xl" : "text-5xl",
             )}
           >
             {e}
