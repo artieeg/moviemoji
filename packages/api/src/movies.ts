@@ -2,7 +2,6 @@ import { env } from "@moviemoji/env";
 import { kv } from "@vercel/kv";
 import OpenAI from "openai";
 import { z } from "zod";
-import { tmdb } from "./router/game";
 
 export const movieSchema = z
   .object({
@@ -33,12 +32,14 @@ export async function populateMovies() {
       continue;
     }
 
-    pipeline.hmset(`movie:${m.id}`, m).sadd("movie_ids", m.id);
+    pipeline
+      .hmset(`movie:${m.id}`, m)
+      .sadd("movie_ids", m.id)
+      .sadd(`movie:${m.id}:emojis`, ...emojis);
   }
 
   pipeline
-    .set<number>("latestTmdbPage", latestTmdbPage + 1)
-    .set("previousRequestTime", Date.now());
+    .set<number>("latestTmdbPage", latestTmdbPage + 1);
 
   await pipeline.exec();
 }
@@ -51,7 +52,7 @@ title: """${title}"""
 
 overview: """${overview}"""
 
-4 EMOJIS REPRESENTING THE MOVIE:`;
+REPLY WITH A JSON ARRAY CONTAINING 4 EMOJIS REPRESENTING THE MOVIE:`;
 
   const completion = await openai.chat.completions.create({
     model: "gpt-3.5-turbo",
@@ -64,22 +65,31 @@ overview: """${overview}"""
     return undefined;
   }
 
-  const emojis = msg.split("");
+  const emojis = JSON.parse(msg);
 
   return emojis;
 }
 
 async function getMovies(page: number) {
-  const movies = await tmdb.get("discover/movie", {
-    params: {
-      order_by: "vote_average.desc",
-      min_vote_count: 300,
-      "primary_release_date.lte": 2020,
-      page,
+  const request = await fetch(
+    "https://api.themoviedb.org/3/discover/movie?" +
+      new URLSearchParams({
+        order_by: "vote_average.desc",
+        min_vote_count: "300",
+        "primary_release_date.lte": "2020",
+        page: page.toString(),
+      }),
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${env.TMDB_API_KEY}`,
+      },
     },
-  });
+  );
 
-  const m = movieList.parse(movies.data.results);
+  const movies = await request.json();
+
+  const m = movieList.parse(movies.results);
 
   return m;
 }
