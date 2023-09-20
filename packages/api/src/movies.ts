@@ -1,4 +1,5 @@
 import { env } from "@moviemoji/env";
+import { createId } from "@paralleldrive/cuid2";
 import { kv } from "@vercel/kv";
 import OpenAI from "openai";
 import { z } from "zod";
@@ -26,20 +27,25 @@ export async function populateMovies() {
   const pipeline = kv.pipeline();
 
   for (const m of movies) {
-    const emojis = await getEmojis(m.title, m.overview);
+    try {
+      const emojis = await getEmojis(m.title, m.overview);
 
-    if (!emojis) {
+      if (!emojis) {
+        continue;
+      }
+
+      const id = createId();
+
+      pipeline
+        .hmset(`movie:${id}`, m)
+        .sadd("movie_ids", id)
+        .sadd(`movie:${id}:emojis`, ...emojis);
+    } catch (e) {
       continue;
     }
-
-    pipeline
-      .hmset(`movie:${m.id}`, m)
-      .sadd("movie_ids", m.id)
-      .sadd(`movie:${m.id}:emojis`, ...emojis);
   }
 
-  pipeline
-    .set<number>("latestTmdbPage", latestTmdbPage + 1);
+  pipeline.set<number>("latestTmdbPage", latestTmdbPage + 1);
 
   await pipeline.exec();
 }
@@ -47,12 +53,12 @@ export async function populateMovies() {
 const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY });
 
 async function getEmojis(title: string, overview: string) {
-  const prompt = `Produce a list of FOUR emojis representing this movie
+  const prompt = `Produce a list of FIVE emojis representing this movie
 title: """${title}"""
 
 overview: """${overview}"""
 
-REPLY WITH A JSON ARRAY CONTAINING 4 EMOJIS REPRESENTING THE MOVIE:`;
+REPLY WITH A JSON ARRAY CONTAINING 5 EMOJIS REPRESENTING THE MOVIE:`;
 
   const completion = await openai.chat.completions.create({
     model: "gpt-3.5-turbo",
@@ -74,9 +80,10 @@ async function getMovies(page: number) {
   const request = await fetch(
     "https://api.themoviedb.org/3/discover/movie?" +
       new URLSearchParams({
+        include_adult: "false",
         order_by: "vote_average.desc",
         min_vote_count: "300",
-        "primary_release_date.lte": "2020",
+        "primary_release_date.lte": "2016-01-01",
         page: page.toString(),
       }),
     {
