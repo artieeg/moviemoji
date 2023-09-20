@@ -1,0 +1,17 @@
+{
+  "name": "@moviemoji/env",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "license": "MIT",
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "@moviemoji/eslint-config/base"
+    ]
+  },
+  "dependencies": {
+    "zod": "^3.22.2"
+  }
+}

@@ -15,6 +15,7 @@ export default {
         "overlay": "rgba(255, 255, 255, 0.16)",
         "orange": "#F9B271",
         "turquoise": "#71F9C8",
+        "red": "#F97171",
         "neutral": {
           "1": "#0A0A0A",
         },
