@@ -85,6 +85,9 @@ importers:
         specifier: ^3.22.2
         version: 3.22.2
     devDependencies:
+      '@moviemoji/env':
+        specifier: ^0.1.0
+        version: link:../../packages/env
       '@moviemoji/eslint-config':
         specifier: ^0.2.0
         version: link:../../tooling/eslint
@@ -137,6 +140,9 @@ importers:
         specifier: ^3.22.2
         version: 3.22.2
     devDependencies:
+      '@moviemoji/env':
+        specifier: ^0.1.0
+        version: link:../env
       '@moviemoji/eslint-config':
         specifier: ^0.2.0
         version: link:../../tooling/eslint

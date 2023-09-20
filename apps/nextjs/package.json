@@ -37,6 +37,7 @@
     "@moviemoji/eslint-config": "^0.2.0",
     "@moviemoji/tailwind-config": "^0.1.0",
     "@moviemoji/tsconfig": "^0.1.0",
+    "@moviemoji/env": "^0.1.0",
     "@types/node": "^18.17.15",
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
