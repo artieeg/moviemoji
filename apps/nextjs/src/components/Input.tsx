@@ -8,7 +8,11 @@ export function Input({
   value,
   onChangeText,
   ...rest
-}: { value: string; onChangeText: (s: string) => void; minimized?: boolean } & HTMLAttributes<HTMLInputElement>) {
+}: {
+  value: string;
+  onChangeText: (s: string) => void;
+  minimized?: boolean;
+} & HTMLAttributes<HTMLInputElement>) {
   const fontSize =
     value.length > 16
       ? 36 - 16 + 6
@@ -32,7 +36,7 @@ export function Input({
           fontSize,
         }}
         className={twJoin(
-          "space-x-1 transition-all duration-200 w-full placeholder:text-white placeholder:opacity-30 bg-transparent select-none appearance-none focus:outline-none",
+          "space-x-1 transition-all h-full duration-700 w-full placeholder:text-white placeholder:opacity-30 bg-transparent select-none appearance-none focus:outline-none",
           "text-center text-6xl font-primary",
         )}
         {...rest}
