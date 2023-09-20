@@ -12,7 +12,7 @@ export const userRouter = createTRPCRouter({
         turnstileToken: z.string(),
       }),
     )
-    .mutation(async ({ input: { turnstileToken }, ctx }) => {
+    .mutation(async ({ input: { turnstileToken } }) => {
       await verifyTurnstileToken(turnstileToken);
 
       const token = await new SignJWT({ id: createId() })
