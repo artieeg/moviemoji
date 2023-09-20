@@ -8,16 +8,12 @@ export const userRouter = createTRPCRouter({
     .input(
       z.object({
         turnstileToken: z.string(),
-        username: z.string(),
       }),
     )
-    .mutation(async ({ input: { username, turnstileToken }, ctx }) => {
+    .mutation(async ({ input: { turnstileToken }, ctx }) => {
       await verifyTurnstileToken(turnstileToken);
 
-      const token = jwt.sign(
-        {
-          username,
-        },
+      const token = jwt.sign({},
         process.env.JWT_SECRET as string,
         {
           expiresIn: "1d",
