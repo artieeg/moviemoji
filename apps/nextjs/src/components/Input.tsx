@@ -1,7 +1,8 @@
 "use client";
 
+import { Challenge } from "@moviemoji/api/src/router/game";
 import { AnimatePresence, motion } from "framer-motion";
-import { HTMLAttributes, useRef } from "react";
+import { HTMLAttributes, useEffect, useRef } from "react";
 import { twJoin } from "tailwind-merge";
 
 export type InputProps = {
@@ -10,6 +11,7 @@ export type InputProps = {
   onChangeText: (s: string) => void;
   minimized?: boolean;
   challengeKey: number;
+  challenge?: Challenge;
 } & HTMLAttributes<HTMLInputElement>;
 
 export function Input({
@@ -17,6 +19,7 @@ export function Input({
   value,
   challengeKey,
   mode,
+  challenge,
   onChangeText,
   ...rest
 }: InputProps) {
@@ -27,12 +30,12 @@ export function Input({
       ? 36 - value.length + 6
       : 36;
 
-  const ref = useRef(null);
+  const ref = useRef<HTMLInputElement>(null);
 
   return (
     <div
       className={twJoin(
-        "flex h-32 w-full sm:max-w-xs items-center justify-center rounded-4xl",
+        "flex relative h-32 w-full sm:max-w-xs items-center justify-center rounded-4xl",
         "transition-all duration-300",
         mode === "correct"
           ? "bg-turquoise"
@@ -42,6 +45,11 @@ export function Input({
       )}
     >
       <input
+        onBlur={() => {
+          //if (mode !== "input") return;
+
+          ref.current?.focus();
+        }}
         onChange={(e) => {
           if (mode !== "input") return;
 
@@ -61,6 +69,20 @@ export function Input({
         )}
         {...rest}
       />
+
+      {challenge && (
+        <div
+          className={twJoin(
+            "absolute bottom-0 font-primary transition-all duration-700",
+            mode === "input" ? "text-white opacity-30" : "text-black",
+          )}
+        >
+          {challenge.expectedWordCount}{" "}
+          {challenge.expectedWordCount === 1 ? "word" : "words"},{" "}
+          {challenge.expectedLength}{" "}
+          {challenge.expectedLength === 1 ? "letter" : "letters"}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,14 +1,26 @@
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { api } from "~/utils/api";
+import { Ad } from "./Ad";
 import { Button } from "./Button";
-import { EmojiDisplay } from "./EmojiDisplay";
+import { EmojiDisplay, EmojiDisplaySkeleton } from "./EmojiDisplay";
 import { Input, InputProps } from "./Input";
 
 export function Game() {
   const [minimized, _setMinimized] = useState<boolean>(false);
   const [value, setValue] = useState<string>("");
 
+  const [showAd, setShowAd] = useState<boolean>(false);
+
   const [currentChallengeIdx, setCurrentChallengeIdx] = useState(0);
+
+  useEffect(() => {
+    setShowAd(currentChallengeIdx === 12);
+  }, [currentChallengeIdx]);
+
+  function onHideAd() {
+    setShowAd(false);
+  }
 
   const game = api.game.getItems.useInfiniteQuery(
     {},
@@ -24,7 +36,7 @@ export function Game() {
     return game.data?.pages.flatMap((page) => page.challenges) ?? [];
   }, [game.data?.pages.length]);
 
-  const currentChallenge = challenges[currentChallengeIdx];
+  const challenge = challenges[currentChallengeIdx];
 
   useEffect(() => {
     if (currentChallengeIdx === challenges.length - 4) {
@@ -40,7 +52,7 @@ export function Game() {
     if (mode !== "input") return;
 
     const result = await submit.mutateAsync({
-      movieId: currentChallenge?.id as string,
+      movieId: challenge?.id as string,
       answer: value,
     });
 
@@ -60,7 +72,7 @@ export function Game() {
 
   const getHint = api.game.getHints.useQuery(
     {
-      movieId: currentChallenge?.id as string,
+      movieId: challenge?.id as string,
     },
     {
       enabled: false,
@@ -80,40 +92,51 @@ export function Game() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center flex-1 space-y-8">
-      <div className="space-y-3">
-        {currentChallenge && (
-          <EmojiDisplay
-            minimized={minimized}
-            emojis={currentChallenge.emojis}
-          />
-        )}
-
-        <Input
-          challengeKey={currentChallengeIdx}
-          mode={mode}
-          value={value}
-          onChangeText={(v) => setValue(v)}
-          onKeyUp={(e) => {
-            if (e.key === "Enter") {
-              onSubmit();
-            }
-          }}
-        />
-      </div>
-
-      <div className="w-full sm:max-w-xs">
-        <Button
-          variant="secondary"
-          onClick={value.length === 0 ? onGetHint : onSubmit}
+    <AnimatePresence mode="wait">
+      {showAd ? (
+        <Ad onHideAd={onHideAd} />
+      ) : (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="flex flex-col items-center justify-center flex-1 space-y-8"
         >
-          {value.length === 0 ? "Get a hint" : "Submit"}
-        </Button>
+          <div className="space-y-3">
+            {challenge ? (
+              <EmojiDisplay minimized={minimized} challenge={challenge} />
+            ) : (
+              <EmojiDisplaySkeleton />
+            )}
 
-        <Button variant="text" onClick={onSkip}>
-          Skip
-        </Button>
-      </div>
-    </div>
+            <Input
+              challenge={challenge}
+              challengeKey={currentChallengeIdx}
+              mode={mode}
+              value={value}
+              onChangeText={(v) => setValue(v)}
+              onKeyUp={(e) => {
+                if (e.key === "Enter") {
+                  onSubmit();
+                }
+              }}
+            />
+          </div>
+
+          <div className="w-full sm:max-w-xs">
+            <Button
+              variant="secondary"
+              onClick={value.length === 0 ? onGetHint : onSubmit}
+            >
+              {value.length === 0 ? "Get a hint" : "Submit"}
+            </Button>
+
+            <Button variant="text" onClick={onSkip}>
+              Skip
+            </Button>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

@@ -1,8 +1,15 @@
 import { z } from "zod";
-import { kv } from "@vercel/kv";
+import { kv } from "../kv";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import levenshtein from "fast-levenshtein";
+
+export type Challenge = {
+  emojis: string[];
+  id: string;
+  expectedLength: number;
+  expectedWordCount: number;
+};
 
 export const gameRouter = createTRPCRouter({
   submitAnswer: protectedProcedure
@@ -12,16 +19,16 @@ export const gameRouter = createTRPCRouter({
         answer: z.string(),
       }),
     )
-    .mutation(async ({ ctx, input: { movieId, answer } }) => {
-      const movieTitle = await kv.hget<string>(`movie:${movieId}`, "title");
+    .mutation(async ({ input: { movieId, answer } }) => {
+      const movieTitle = await kv.hget(`movie:${movieId}`, "title");
 
       if (!movieTitle) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
       const distance = levenshtein.get(
-        movieTitle.toLowerCase(),
-        answer.toLowerCase(),
+        movieTitle.toLowerCase().trim(),
+        answer.toLowerCase().trim(),
       );
 
       if (
@@ -44,8 +51,8 @@ export const gameRouter = createTRPCRouter({
         movieId: z.string(),
       }),
     )
-    .query(async ({ ctx, input: { movieId } }) => {
-      const movieTitle = await kv.hget<string>(`movie:${movieId}`, "title");
+    .query(async ({ input: { movieId } }) => {
+      const movieTitle = await kv.hget(`movie:${movieId}`, "title");
 
       if (!movieTitle) {
         throw new TRPCError({ code: "NOT_FOUND" });
@@ -62,29 +69,49 @@ export const gameRouter = createTRPCRouter({
         cursor: z.number().optional().default(0),
       }),
     )
-    .query(async ({ ctx, input: { cursor } }) => {
-      const randomMovieIds = await kv.srandmember<string[]>("movie_ids", 20);
+    .query(async ({ input: { cursor } }) => {
+      const randomMovieIds = await kv.srandmember("movie_ids", 20);
 
-      const pipeline = kv.pipeline();
+      const getMovieTitlePipeline = kv.pipeline();
+      const getEmojisPipeline = kv.pipeline();
 
       if (!randomMovieIds) {
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
 
       for (const id of randomMovieIds) {
-        pipeline.smembers(`movie:${id}:emojis`);
+        getEmojisPipeline.smembers(`movie:${id}:emojis`);
+        getMovieTitlePipeline.hget(`movie:${id}`, "title");
       }
 
-      const emojiSets = await pipeline.exec<string[][]>();
+      const [emojiSetsResult, titlesResult] = await Promise.all([
+        getEmojisPipeline.exec(),
+        getMovieTitlePipeline.exec(),
+      ]);
 
-      const challenges: { emojis: string[]; id: string }[] = [];
+      const challenges: Challenge[] = [];
+
+      if (!emojiSetsResult || !titlesResult) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      }
+
+      const emojiSets = emojiSetsResult.map((r) => r[1]);
+      const titles = titlesResult.map((r) => r[1]);
+
+      if (!emojiSets || !titles) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      }
 
       for (let i = 0; i < emojiSets.length; i++) {
-        const emojiSet = emojiSets[i];
+        const emojiSet = emojiSets[i] as string[];
+        const title = titles[i] as string;
 
-        if (!emojiSet) {
+        if (!emojiSet || !title) {
           throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
         }
+
+        const expectedLength = title.length;
+        const expectedWordCount = title.split(" ").length;
 
         const movieId = randomMovieIds[i];
 
@@ -92,12 +119,10 @@ export const gameRouter = createTRPCRouter({
           throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
         }
 
-        if (emojiSet.length !== 5) {
-          continue;
-        }
-
         challenges.push({
           emojis: emojiSet,
+          expectedLength,
+          expectedWordCount,
           id: movieId,
         });
       }
