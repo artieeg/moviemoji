@@ -28,9 +28,14 @@ export async function populateMovies() {
 
   for (const m of movies) {
     try {
+      // Skip movies with long title cause they're not fun
+      if (m.title.length > 18) {
+        continue;
+      }
+
       const emojis = await getEmojis(m.title, m.overview);
 
-      if (!emojis) {
+      if (!emojis || emojis.length !== 5) {
         continue;
       }
 
@@ -39,6 +44,7 @@ export async function populateMovies() {
       pipeline
         .hmset(`movie:${id}`, m)
         .sadd("movie_ids", id)
+        .set(`length:${id}`, emojis.length)
         .sadd(`movie:${id}:emojis`, ...emojis);
     } catch (e) {
       continue;
@@ -58,7 +64,9 @@ title: """${title}"""
 
 overview: """${overview}"""
 
-REPLY WITH A JSON ARRAY CONTAINING 5 EMOJIS REPRESENTING THE MOVIE:`;
+EMOJIS SHOULD BE SEPARATED BY WHITESPACE.
+
+REPLY WITH A STRING CONTAINING 5 EMOJIS REPRESENTING THE MOVIE:`;
 
   const completion = await openai.chat.completions.create({
     model: "gpt-3.5-turbo",
@@ -71,7 +79,11 @@ REPLY WITH A JSON ARRAY CONTAINING 5 EMOJIS REPRESENTING THE MOVIE:`;
     return undefined;
   }
 
-  const emojis = JSON.parse(msg);
+  console.log(msg)
+
+  const emojis = msg.split(" ");
+
+  console.log(emojis);
 
   return emojis;
 }
@@ -82,7 +94,8 @@ async function getMovies(page: number) {
       new URLSearchParams({
         include_adult: "false",
         order_by: "vote_average.desc",
-        min_vote_count: "300",
+        min_vote_count: "500",
+        "vote_average.gte": "7",
         "primary_release_date.lte": "2016-01-01",
         page: page.toString(),
       }),

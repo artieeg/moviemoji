@@ -65,24 +65,34 @@ export const gameRouter = createTRPCRouter({
     .query(async ({ ctx, input: { cursor } }) => {
       const randomMovieIds = await kv.srandmember<string[]>("movie_ids", 20);
 
-      const pipeline = kv.pipeline();
+      const getMovieTitleLengthPipeline = kv.pipeline();
+      const getEmojisPipeline = kv.pipeline();
 
       if (!randomMovieIds) {
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
 
       for (const id of randomMovieIds) {
-        pipeline.smembers(`movie:${id}:emojis`);
+        getEmojisPipeline.smembers(`movie:${id}:emojis`);
+        getMovieTitleLengthPipeline.get(`length:${id}`);
       }
 
-      const emojiSets = await pipeline.exec<string[][]>();
+      const [emojiSets, titleLengths] = await Promise.all([
+        getEmojisPipeline.exec<string[][]>(),
+        getMovieTitleLengthPipeline.exec<number[]>(),
+      ]);
 
-      const challenges: { emojis: string[]; id: string }[] = [];
+      const challenges: {
+        emojis: string[];
+        id: string;
+        expectedLength: number;
+      }[] = [];
 
       for (let i = 0; i < emojiSets.length; i++) {
         const emojiSet = emojiSets[i];
+        const expectedLength = titleLengths[i];
 
-        if (!emojiSet) {
+        if (!emojiSet || !expectedLength) {
           throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
         }
 
@@ -92,12 +102,9 @@ export const gameRouter = createTRPCRouter({
           throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
         }
 
-        if (emojiSet.length !== 5) {
-          continue;
-        }
-
         challenges.push({
           emojis: emojiSet,
+          expectedLength,
           id: movieId,
         });
       }
