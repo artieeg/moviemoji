@@ -7,13 +7,9 @@ import { env } from "@moviemoji/env";
 
 export const userRouter = createTRPCRouter({
   createUser: publicProcedure
-    .input(
-      z.object({
-        turnstileToken: z.string(),
-      }),
-    )
-    .mutation(async ({ input: { turnstileToken } }) => {
-      await verifyTurnstileToken(turnstileToken);
+    .input(z.object({}))
+    .mutation(async ({ input: { } }) => {
+      //await verifyTurnstileToken(turnstileToken);
 
       const token = await new SignJWT({ id: createId() })
         .setProtectedHeader({

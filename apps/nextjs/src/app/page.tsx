@@ -1,7 +1,7 @@
 "use client";
 
 import { Turnstile } from "@marsidev/react-turnstile";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Game } from "~/components/Game";
 import { api } from "~/utils/api";
 import { token } from "./providers";
@@ -21,11 +21,9 @@ export default function HomePage() {
     },
   });
 
-  function onTurnstileSuccess(turnstileToken: string) {
-    createUser.mutate({
-      turnstileToken,
-    });
-  }
+  useEffect(() => {
+    createUser.mutate({});
+  }, []);
 
   return (
     <main className="flex h-screen flex-col text-white">
@@ -36,6 +34,7 @@ export default function HomePage() {
               Loading...
             </span>
 
+            {/*
             <Turnstile
               as="aside"
               onExpire={() => ref.current?.reset()}
@@ -50,6 +49,7 @@ export default function HomePage() {
                 appendTo: "body",
               }}
             />
+            */}
           </div>
         ) : (
           <Game />

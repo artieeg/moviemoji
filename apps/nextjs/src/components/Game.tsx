@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "~/utils/api";
 import { Button } from "./Button";
-import { EmojiDisplay } from "./EmojiDisplay";
+import { EmojiDisplay, EmojiDisplaySkeleton } from "./EmojiDisplay";
 import { Input, InputProps } from "./Input";
 
 export function Game() {
@@ -24,7 +24,7 @@ export function Game() {
     return game.data?.pages.flatMap((page) => page.challenges) ?? [];
   }, [game.data?.pages.length]);
 
-  const currentChallenge = challenges[currentChallengeIdx];
+  const challenge = challenges[currentChallengeIdx];
 
   useEffect(() => {
     if (currentChallengeIdx === challenges.length - 4) {
@@ -40,7 +40,7 @@ export function Game() {
     if (mode !== "input") return;
 
     const result = await submit.mutateAsync({
-      movieId: currentChallenge?.id as string,
+      movieId: challenge?.id as string,
       answer: value,
     });
 
@@ -60,7 +60,7 @@ export function Game() {
 
   const getHint = api.game.getHints.useQuery(
     {
-      movieId: currentChallenge?.id as string,
+      movieId: challenge?.id as string,
     },
     {
       enabled: false,
@@ -82,14 +82,14 @@ export function Game() {
   return (
     <div className="flex flex-col items-center justify-center flex-1 space-y-8">
       <div className="space-y-3">
-        {currentChallenge && (
-          <EmojiDisplay
-            minimized={minimized}
-            emojis={currentChallenge.emojis}
-          />
+        {challenge ? (
+          <EmojiDisplay minimized={minimized} challenge={challenge} />
+        ) : (
+          <EmojiDisplaySkeleton />
         )}
 
         <Input
+          challenge={challenge}
           challengeKey={currentChallengeIdx}
           mode={mode}
           value={value}

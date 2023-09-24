@@ -5,11 +5,9 @@ import "~/styles/globals.css";
 
 import { headers } from "next/headers";
 
-import { AccessTokenProvider, TRPCReactProvider } from "./providers";
+import { TRPCReactProvider } from "./providers";
 import { twJoin } from "tailwind-merge";
 import { IconoirProvider } from "iconoir-react";
-import Script from "next/script";
-import { useState } from "react";
 
 const montserrat = Montserrat({
   variable: "--font-primary",

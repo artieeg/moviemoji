@@ -2,12 +2,13 @@
 
 import { motion } from "framer-motion";
 import { twJoin } from "tailwind-merge";
+import type { Challenge } from "@moviemoji/api/src/router/game";
 
 export function EmojiDisplay({
-  emojis,
+  challenge: { emojis },
   minimized,
 }: {
-  emojis: string[];
+  challenge: Challenge;
   minimized: boolean;
 }) {
   return (
@@ -36,6 +37,36 @@ export function EmojiDisplay({
           >
             {e}
           </span>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+export function EmojiDisplaySkeleton() {
+  const items = [1, 2, 3, 4, 5];
+
+  return (
+    <div
+      key={"emoji-display-skeleton"}
+      className={twJoin(
+        "space-x-1 h-32 px-8 flex bg-overlay w-full sm:max-w-xs items-center  select-none rounded-4xl",
+      )}
+    >
+      {items.map((e, idx) => (
+        <motion.div
+          key={e}
+          className="flex-1"
+          initial={{ opacity: 0 }}
+          transition={{
+            delay: 0.4 + idx * 0.4,
+            duration: 0.8,
+          }}
+          animate={{
+            opacity: [null, 0.15],
+          }}
+        >
+          <div className="transition-all aspect-square rounded-full bg-white duration-200 h-12 w-12" />
         </motion.div>
       ))}
     </div>
