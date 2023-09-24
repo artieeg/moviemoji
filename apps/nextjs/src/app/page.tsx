@@ -7,7 +7,7 @@ import { api } from "~/utils/api";
 import { token } from "./providers";
 import { env } from "@moviemoji/env";
 
-export const runtime = "edge";
+//export const runtime = "edge";
 
 export default function HomePage() {
   const [isLoading, setLoading] = useState<boolean>(true);
@@ -26,33 +26,20 @@ export default function HomePage() {
   }, []);
 
   return (
-    <main className="flex h-screen flex-col text-white">
+    <main className="flex flex-col min-h-screen text-white">
       <div className="flex flex-col flex-1 sm:px-0 px-8">
         {isLoading ? (
-          <div className="flex items-center justify-center flex-1">
+          <div className="flex h-screen items-center justify-center flex-1">
             <span className="font-primary text-white opacity-50 text-lg">
               Loading...
             </span>
-
-            {/*
-            <Turnstile
-              as="aside"
-              onExpire={() => ref.current?.reset()}
-              onSuccess={onTurnstileSuccess}
-              siteKey={env.NEXT_PUBLIC_CLOUDFLARE_SITE_KEY}
-              className="fixed bottom-4 right-4"
-              options={{
-                theme: "light",
-                appearance: "interaction-only",
-              }}
-              scriptOptions={{
-                appendTo: "body",
-              }}
-            />
-            */}
           </div>
         ) : (
-          <Game />
+          <div>
+            <div className="h-screen flex-col flex">
+              <Game />
+            </div>
+          </div>
         )}
       </div>
     </main>

@@ -1,6 +1,6 @@
 import { env } from "@moviemoji/env";
 import { createId } from "@paralleldrive/cuid2";
-import { kv } from "@vercel/kv";
+import { kv } from "./kv";
 import OpenAI from "openai";
 import { z } from "zod";
 
@@ -16,7 +16,7 @@ export const movieSchema = z
 const movieList = z.array(movieSchema);
 
 export async function populateMovies() {
-  const latestTmdbPage = (await kv.get<number>("latestTmdbPage")) ?? 1;
+  const latestTmdbPage = Number(await kv.get("latestTmdbPage")) ?? 1;
 
   if (latestTmdbPage >= 20) {
     return;
@@ -51,7 +51,7 @@ export async function populateMovies() {
     }
   }
 
-  pipeline.set<number>("latestTmdbPage", latestTmdbPage + 1);
+  pipeline.set("latestTmdbPage", latestTmdbPage + 1);
 
   await pipeline.exec();
 }
@@ -79,7 +79,7 @@ REPLY WITH A STRING CONTAINING 5 EMOJIS REPRESENTING THE MOVIE:`;
     return undefined;
   }
 
-  console.log(msg)
+  console.log(msg);
 
   const emojis = msg.split(" ");
 

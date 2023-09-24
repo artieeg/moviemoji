@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { kv } from "@vercel/kv";
+import { kv } from "../kv";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import levenshtein from "fast-levenshtein";
@@ -20,7 +20,7 @@ export const gameRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input: { movieId, answer } }) => {
-      const movieTitle = await kv.hget<string>(`movie:${movieId}`, "title");
+      const movieTitle = await kv.hget(`movie:${movieId}`, "title");
 
       if (!movieTitle) {
         throw new TRPCError({ code: "NOT_FOUND" });
@@ -52,7 +52,7 @@ export const gameRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input: { movieId } }) => {
-      const movieTitle = await kv.hget<string>(`movie:${movieId}`, "title");
+      const movieTitle = await kv.hget(`movie:${movieId}`, "title");
 
       if (!movieTitle) {
         throw new TRPCError({ code: "NOT_FOUND" });
@@ -70,7 +70,7 @@ export const gameRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input: { cursor } }) => {
-      const randomMovieIds = await kv.srandmember<string[]>("movie_ids", 20);
+      const randomMovieIds = await kv.srandmember("movie_ids", 20);
 
       const getMovieTitlePipeline = kv.pipeline();
       const getEmojisPipeline = kv.pipeline();
@@ -84,16 +84,27 @@ export const gameRouter = createTRPCRouter({
         getMovieTitlePipeline.hget(`movie:${id}`, "title");
       }
 
-      const [emojiSets, titles] = await Promise.all([
-        getEmojisPipeline.exec<string[][]>(),
-        getMovieTitlePipeline.exec<string[]>(),
+      const [emojiSetsResult, titlesResult] = await Promise.all([
+        getEmojisPipeline.exec(),
+        getMovieTitlePipeline.exec(),
       ]);
 
       const challenges: Challenge[] = [];
 
+      if (!emojiSetsResult || !titlesResult) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      }
+
+      const emojiSets = emojiSetsResult.map((r) => r[1]);
+      const titles = titlesResult.map((r) => r[1]);
+
+      if (!emojiSets || !titles) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      }
+
       for (let i = 0; i < emojiSets.length; i++) {
-        const emojiSet = emojiSets[i];
-        const title = titles[i];
+        const emojiSet = emojiSets[i] as string[];
+        const title = titles[i] as string;
 
         if (!emojiSet || !title) {
           throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });

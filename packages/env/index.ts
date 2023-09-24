@@ -18,7 +18,7 @@ export const env = createEnv({
     CLOUDFLARE_SECRET_KEY: z.string(),
     TMDB_API_KEY: z.string(),
     OPENAI_API_KEY: z.string(),
-    KV_URL: z.string(),
+    REDIS_URL: z.string(),
   },
   /**
    * Specify your client-side environment variables schema here.
@@ -34,7 +34,7 @@ export const env = createEnv({
     TMDB_API_KEY: process.env.TMDB_API_KEY,
     JWT_SECRET: process.env.JWT_SECRET,
     VERCEL_URL: process.env.VERCEL_URL,
-    KV_URL: process.env.KV_URL,
+    REDIS_URL: process.env.REDIS_URL,
     PORT: process.env.PORT,
     CLOUDFLARE_SECRET_KEY: process.env.CLOUDFLARE_SECRET_KEY,
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
