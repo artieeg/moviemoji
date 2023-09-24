@@ -29,7 +29,7 @@ export default function HomePage() {
 
   return (
     <main className="flex h-screen flex-col text-white">
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1 sm:px-0 px-8">
         {isLoading ? (
           <div className="flex items-center justify-center flex-1">
             <span className="font-primary text-white opacity-50 text-lg">
