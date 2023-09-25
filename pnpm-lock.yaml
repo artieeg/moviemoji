@@ -60,6 +60,9 @@ importers:
       '@trpc/server':
         specifier: ^10.38.3
         version: 10.38.3
+      '@vercel/analytics':
+        specifier: ^1.0.2
+        version: 1.0.2
       framer-motion:
         specifier: ^10.16.4
         version: 10.16.4(react-dom@18.2.0)(react@18.2.0)
@@ -1001,6 +1004,10 @@ packages:
     dependencies:
       '@typescript-eslint/types': 6.7.0
       eslint-visitor-keys: 3.4.3
+    dev: false
+
+  /@vercel/analytics@1.0.2:
+    resolution: {integrity: sha512-BZFxVrv24VbNNl5xMxqUojQIegEeXMI6rX3rg1uVLYUEXsuKNBSAEQf4BWEcjQDp/8aYJOj6m8V4PUA3x/cxgg==}
     dev: false
 
   /abort-controller@3.0.0:
