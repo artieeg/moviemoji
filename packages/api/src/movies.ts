@@ -16,44 +16,46 @@ export const movieSchema = z
 const movieList = z.array(movieSchema);
 
 export async function populateMovies() {
-  const latestTmdbPage = Number(await kv.get("latestTmdbPage")) ?? 1;
+  for (let i = 0; i < 20; i++) {
+    const latestTmdbPage = Number(await kv.get("latestTmdbPage")) ?? 1;
 
-  if (latestTmdbPage >= 20) {
-    return;
-  }
-
-  const movies = await getMovies(latestTmdbPage + 1);
-
-  const pipeline = kv.pipeline();
-
-  for (const m of movies) {
-    try {
-      // Skip movies with long title cause they're not fun
-      if (m.title.length > 18) {
-        continue;
-      }
-
-      const emojis = await getEmojis(m.title, m.overview);
-
-      if (!emojis || emojis.length !== 5) {
-        continue;
-      }
-
-      const id = createId();
-
-      pipeline
-        .hmset(`movie:${id}`, m)
-        .sadd("movie_ids", id)
-        .set(`length:${id}`, emojis.length)
-        .sadd(`movie:${id}:emojis`, ...emojis);
-    } catch (e) {
-      continue;
+    if (latestTmdbPage >= 20) {
+      return;
     }
+
+    const movies = await getMovies(latestTmdbPage + 1);
+
+    const pipeline = kv.pipeline();
+
+    for (const m of movies) {
+      try {
+        // Skip movies with long title cause they're not fun
+        if (m.title.length > 18) {
+          continue;
+        }
+
+        const emojis = await getEmojis(m.title, m.overview);
+
+        if (!emojis || emojis.length !== 5) {
+          continue;
+        }
+
+        const id = createId();
+
+        pipeline
+          .hmset(`movie:${id}`, m)
+          .sadd("movie_ids", id)
+          .set(`length:${id}`, emojis.length)
+          .sadd(`movie:${id}:emojis`, ...emojis);
+      } catch (e) {
+        continue;
+      }
+    }
+
+    pipeline.set("latestTmdbPage", latestTmdbPage + 1);
+
+    await pipeline.exec();
   }
-
-  pipeline.set("latestTmdbPage", latestTmdbPage + 1);
-
-  await pipeline.exec();
 }
 
 const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY });
