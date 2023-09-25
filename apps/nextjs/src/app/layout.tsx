@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Montserrat, Poppins } from "next/font/google";
+import { Analytics } from '@vercel/analytics/react';
 
 import "~/styles/globals.css";
 
@@ -53,6 +54,8 @@ export default function Layout(props: { children: React.ReactNode }) {
             {props.children}
           </TRPCReactProvider>
         </IconoirProvider>
+
+        <Analytics />
       </body>
     </html>
   );
